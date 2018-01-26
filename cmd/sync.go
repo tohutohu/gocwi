@@ -3,11 +3,13 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"github.com/spf13/cobra"
 	"github.com/wtks/gocwi/api"
 	"gopkg.in/cheggaaa/pb.v1"
-	"os"
-	"path"
 )
 
 var syncCmd = &cobra.Command{
@@ -54,7 +56,7 @@ var syncCmd = &cobra.Command{
 				for _, c := range notes.Classes {
 					if len(c.Attachments) > 0 {
 						fmt.Printf("#%s\n", c.Title)
-						dir := path.Join(destDir, s.Name)
+						dir := path.Join(destDir, strings.Replace(s.Name, "/", "-", -1))
 						if err := makeDirsIfNotExist(dir); err != nil {
 							return err
 						}
@@ -63,7 +65,7 @@ var syncCmd = &cobra.Command{
 							fmt.Printf("+ %s(%s) - %d/%d/%d\n", a.Title, a.Type, a.Year, a.Month, a.Day)
 							bar := pb.New(0)
 							bar.Units = pb.U_BYTES_DEC
-							dest := path.Join(dir, c.Title+" - "+a.Title+"."+a.Ext)
+							dest := path.Join(dir, strings.Replace(c.Title, "/", "-", -1)+" - "+strings.Replace(a.Title, "/", "-", -1)+"."+a.Ext)
 							if _, err := os.Stat(dest); err == nil {
 								fmt.Println("already exists. skip.")
 								continue
